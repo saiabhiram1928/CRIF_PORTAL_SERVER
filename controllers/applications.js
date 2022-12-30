@@ -429,11 +429,6 @@ const adminApproveApplication = async (req, res, next) => {
     }
 };
 
-const uploadPaymentSlip = async (req, res, next) => {
-    console.log("Payment Controller", req.body.file);
-    res.send(200).send(req.body.file);
-};
-
 exports.getAllByEmail = getAllByEmail;
 exports.getAllByEmailWithInstrument = getAllByEmailWithInstrument;
 exports.getAllByEmailForDashboard = getAllByEmailForDashboard;
@@ -445,4 +440,3 @@ exports.rejectApplication = rejectApplication;
 exports.facultyApproveApplication = facultyApproveApplication;
 exports.inchargeApproveApplication = inchargeApproveApplication;
 exports.adminApproveApplication = adminApproveApplication;
-exports.uploadPaymentSlip = uploadPaymentSlip;

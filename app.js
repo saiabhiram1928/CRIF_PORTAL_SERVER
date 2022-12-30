@@ -28,8 +28,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/uploads", express.static(path.resolve(__dirname, "./uploads")));
-
 app.use("/applications", applicationsRouter);
 app.use("/equipments", equipmentsRouter);
 app.use("/cdord", cdordRouter);
