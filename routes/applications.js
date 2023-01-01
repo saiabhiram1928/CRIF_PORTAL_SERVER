@@ -1,7 +1,7 @@
 const express = require("express");
 
-const multer = require("multer");
-const fs = require("fs");
+// const multer = require("multer");
+// const fs = require("fs");
 
 const applicationController = require("../controllers/applications");
 const { isKeyObject } = require("util/types");
@@ -41,36 +41,36 @@ applicationRouter.get(
 
 applicationRouter.post("/createItem", applicationController.createItem);
 
-// TEMP CODE TO UPLOAD AND RETERIVE PAYMENT SLIPS AT BACKEND
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const email = req.query.email;
-        const today = new Date();
-        const dd = String(today.getDate()).padStart(2, "0");
-        const mm = String(today.getMonth() + 1).padStart(2, "0");
-        const yyyy = today.getFullYear();
-        const date = dd + "-" + mm + "-" + yyyy;
-        const folderName = `./public/${email}/${date}`;
-        if (!fs.existsSync(folderName)) {
-            fs.mkdirSync(folderName);
-        }
-        cb(null, folderName);
-    },
-    filename: (req, file, cb) => {
-        const application_id = req.query.application_id;
-        cb(null, application_id + "-" + file.originalname);
-    },
-});
+// // TEMP CODE TO UPLOAD AND RETERIVE PAYMENT SLIPS AT BACKEND
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         const email = req.query.email;
+//         const today = new Date();
+//         const dd = String(today.getDate()).padStart(2, "0");
+//         const mm = String(today.getMonth() + 1).padStart(2, "0");
+//         const yyyy = today.getFullYear();
+//         const date = dd + "-" + mm + "-" + yyyy;
+//         const folderName = `./public/${email}/${date}`;
+//         if (!fs.existsSync(folderName)) {
+//             fs.mkdirSync(folderName);
+//         }
+//         cb(null, folderName);
+//     },
+//     filename: (req, file, cb) => {
+//         const application_id = req.query.application_id;
+//         cb(null, application_id + "-" + file.originalname);
+//     },
+// });
 
-const upload = multer({ storage }).single("file");
+// const upload = multer({ storage }).single("file");
 
-applicationRouter.post("/uploadPaymentSlip", (req, res) => {
-    upload(req, res, (err) => {
-        if (err) {
-            return res.status(500).json(err);
-        }
-        return res.status(200).send(req.file);
-    });
-});
+// applicationRouter.post("/uploadPaymentSlip", (req, res) => {
+//     upload(req, res, (err) => {
+//         if (err) {
+//             return res.status(500).json(err);
+//         }
+//         return res.status(200).send(req.file);
+//     });
+// });
 
 module.exports = applicationRouter;

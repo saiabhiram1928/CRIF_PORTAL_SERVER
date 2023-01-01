@@ -10,6 +10,7 @@ const icpoesRouter = require("./routes/icpoes");
 const plRouter = require("./routes/pl");
 const mailerRouter = require("./routes/mailer");
 const usersRouter = require("./routes/users");
+const filesRouter = require("./routes/files");
 
 const app = express();
 app.use(express.json({ extended: false }));
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/applications", applicationsRouter);
+app.use("/files", filesRouter);
 app.use("/equipments", equipmentsRouter);
 app.use("/cdord", cdordRouter);
 app.use("/esr", esrRouter);
