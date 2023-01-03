@@ -12,9 +12,12 @@ const mailerRouter = require("./routes/mailer");
 const usersRouter = require("./routes/users");
 const filesRouter = require("./routes/files");
 
+const PORT = 8050;
+
 const app = express();
 app.use(express.json({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/public", express.static("public"));
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -40,4 +43,6 @@ app.use("/mailer", mailerRouter);
 app.use("/users", usersRouter);
 
 var server = http.createServer(app);
-server.listen(8050);
+server.listen(PORT, () => {
+    console.log(`Server Running on PORT ${PORT}...`);
+});

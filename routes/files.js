@@ -8,4 +8,6 @@ filesRouter.post(
     "/getPaymentSlipsByEmail",
     filesControler.getPaymentSlipsUploadByEmail
 );
+filesRouter.post("/downloadPaymentSlip", filesControler.downloadPaymentSlip);
+
 module.exports = filesRouter;
