@@ -198,6 +198,205 @@ const getAllForFaculty = async (req, res, next) => {
         }
     }
 };
+const getAllForIncharge = async (req, res, next) => {
+    try {
+        const name = req.query.name;
+        const status = req.query.status;
+        pool.getConnection(async (err, connection) => {
+            if (err && !res.headersSent) {
+                res.status(404).json(err);
+            }
+            var result = [];
+            const [rows] = await connection
+                .promise()
+                .query(
+                    "SELECT * FROM applications WHERE supervisor_name = ? AND (status='WORK IN PROGRESS' OR status= ?)",
+                    [name, status]
+                )
+                .catch((err) => {
+                    if (!res.headersSent) {
+                        res.status(404).json(err);
+                    }
+                });
+            connection.release();
+            for (var x of rows) {
+                var data = [];
+                const [samples] = await connection
+                    .promise()
+                    .query(
+                        `SELECT * FROM ${x.instrument_code.toLowerCase()} WHERE application_id = ? ORDER BY application_id`,
+                        [x.application_id]
+                    )
+                    .catch((err) => {
+                        if (!res.headersSent) {
+                            res.status(404).json(err);
+                        }
+                    });
+                for (var y of samples) {
+                    data.push(y);
+                }
+                result.push({ ...x, data: data });
+            }
+
+            if (!res.headersSent) {
+                res.status(200).json(result);
+            }
+        });
+    } catch (err) {
+        if (!res.headersSent) {
+            res.status(404).json(err);
+        }
+    }
+};
+const getResultsForSuperUsers = async (req, res, next) => {
+
+    try {
+        const name = req.query.name;
+        const status = req.query.status;
+        pool.getConnection(async (err, connection) => {
+            if (err && !res.headersSent) {
+                res.status(404).json(err);
+            }
+            var result = [];
+            const [rows] = await connection
+                .promise()
+                .query(
+                    "SELECT * FROM applications WHERE supervisor_name = ? AND status= ?",
+                    [name, status]
+                )
+                .catch((err) => {
+                    if (!res.headersSent) {
+                        res.status(404).json(err);
+                    }
+                });
+            connection.release();
+            for (var x of rows) {
+                var data = [];
+                const [samples] = await connection
+                    .promise()
+                    .query(
+                        `SELECT * FROM ${x.instrument_code.toLowerCase()} WHERE application_id = ? ORDER BY application_id`,
+                        [x.application_id]
+                    )
+                    .catch((err) => {
+                        if (!res.headersSent) {
+                            res.status(404).json(err);
+                        }
+                    });
+                for (var y of samples) {
+                    data.push(y);
+                }
+                result.push({ ...x, data: data });
+            }
+
+            if (!res.headersSent) {
+                res.status(200).json(result);
+            }
+        });
+    } catch (err) {
+        if (!res.headersSent) {
+            res.status(404).json(err);
+        }
+    }
+};
+const getResultsForAdmin = async (req, res, next) => {
+
+    try {
+
+        const status = req.query.status;
+        pool.getConnection(async (err, connection) => {
+            if (err && !res.headersSent) {
+                res.status(404).json(err);
+            }
+            var result = [];
+            const [rows] = await connection
+                .promise()
+                .query(
+                    "SELECT * FROM applications WHERE status= ?",
+                    [status]
+                )
+                .catch((err) => {
+                    if (!res.headersSent) {
+                        res.status(404).json(err);
+                    }
+                });
+            connection.release();
+            for (var x of rows) {
+                var data = [];
+                const [samples] = await connection
+                    .promise()
+                    .query(
+                        `SELECT * FROM ${x.instrument_code.toLowerCase()} WHERE application_id = ? ORDER BY application_id`,
+                        [x.application_id]
+                    )
+                    .catch((err) => {
+                        if (!res.headersSent) {
+                            res.status(404).json(err);
+                        }
+                    });
+                for (var y of samples) {
+                    data.push(y);
+                }
+                result.push({ ...x, data: data });
+            }
+
+            if (!res.headersSent) {
+                res.status(200).json(result);
+            }
+        });
+    } catch (err) {
+        if (!res.headersSent) {
+            res.status(404).json(err);
+        }
+    }
+};
+const getResultsForStudent = async (req, res, next) => {
+
+    try {
+        const email = req.query.email;
+        pool.getConnection(async (err, connection) => {
+            if (err && !res.headersSent) {
+                res.status(404).json(err);
+            }
+            var result = [];
+            const [rows] = await connection
+                .promise()
+                .query("SELECT * FROM applications WHERE email = ?", [email])
+                .catch((err) => {
+                    if (!res.headersSent) {
+                        res.status(404).json(err);
+                    }
+                });
+            connection.release();
+            for (var x of rows) {
+                var data = [];
+                const [samples] = await connection
+                    .promise()
+                    .query(
+                        `SELECT * FROM ${x.instrument_code.toLowerCase()} WHERE application_id = ? ORDER BY application_id`,
+                        [x.application_id]
+                    )
+                    .catch((err) => {
+                        if (!res.headersSent) {
+                            res.status(404).json(err);
+                        }
+                    });
+                for (var y of samples) {
+                    data.push(y);
+                }
+                result.push({ ...x, data: data });
+            }
+
+            if (!res.headersSent) {
+                res.status(200).json(result);
+            }
+        });
+    } catch (err) {
+        if (!res.headersSent) {
+            res.status(404).json(err);
+        }
+    }
+};
 
 const getAllForAdmin = async (req, res, next) => {
     try {
@@ -369,6 +568,37 @@ const facultyApproveApplication = async (req, res, next) => {
     }
 };
 
+
+const inchargeUploadedResults = async (req, res, next) => {
+    try {
+        const application_id = req.query.application_id;
+        pool.getConnection(async (err, connection) => {
+            if (err && !res.headersSent) {
+                res.status(404).json(err);
+            }
+            const [row] = await connection
+                .promise()
+                .query(
+                    "UPDATE applications SET status = 'RESULTS UPLOADED' WHERE application_id = ?",
+                    [application_id]
+                )
+                .catch((err) => {
+                    if (!res.headersSent) {
+                        res.status(404).json(err);
+                    }
+                });
+            if (!res.headersSent) {
+                res.status(200).json({ message: "Operation Successful" });
+            }
+            connection.release();
+        });
+    } catch (err) {
+        if (!res.headersSent) {
+            res.status(404).json(err);
+        }
+    }
+};
+
 const inchargeApproveApplication = async (req, res, next) => {
     try {
         const application_id = req.query.application_id;
@@ -433,10 +663,15 @@ exports.getAllByEmail = getAllByEmail;
 exports.getAllByEmailWithInstrument = getAllByEmailWithInstrument;
 exports.getAllByEmailForDashboard = getAllByEmailForDashboard;
 exports.getAllForFaculty = getAllForFaculty;
+exports.getAllForIncharge= getAllForIncharge;
 exports.getAllForAdmin = getAllForAdmin;
 exports.getItem = getItem;
 exports.createItem = createItem;
 exports.rejectApplication = rejectApplication;
 exports.facultyApproveApplication = facultyApproveApplication;
 exports.inchargeApproveApplication = inchargeApproveApplication;
+exports.inchargeUploadedResults=inchargeUploadedResults;
 exports.adminApproveApplication = adminApproveApplication;
+exports.getResultsForStudent=getResultsForStudent;
+exports.getResultsForSuperUsers=getResultsForSuperUsers;
+exports.getResultsForAdmin = getResultsForAdmin

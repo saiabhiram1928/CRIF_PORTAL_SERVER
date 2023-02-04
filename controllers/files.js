@@ -5,15 +5,20 @@ const fs = require("fs");
 const path = require("path");
 const { promises: fsPromise } = require("fs");
 
+
+// payments upload #
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const email = req.query.email;
         const application_id = req.query.application_id;
-        const folderName = `./public/${email}/${application_id}`;
-        if (!fs.existsSync(folderName)) {
-            fs.mkdirSync(folderName, { recursive: true });
+        const folderName=req.query.folderName;
+        const folderStruct = `./public/${email}/${application_id}/${folderName}`;
+        console.log(folderStruct)
+        if (!fs.existsSync(folderStruct)) {
+            fs.mkdirSync(folderStruct, { recursive: true });
         }
-        cb(null, folderName);
+        cb(null, folderStruct)
     },
     filename: (req, file, cb) => {
         const today = new Date();
@@ -27,7 +32,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage }).single("file");
 
-const uploadPaymentSlip = (req, res) => {
+
+//changed the route name from : uploadPaymentSlip to to:uploadFile
+const uploadFiles = (req, res) => {
     upload(req, res, (err) => {
         if (err) {
             return res.status(500).json(err);
@@ -52,7 +59,7 @@ const getPaymentSlipsUploadByEmail = async (req, res) => {
 
 const downloadPaymentSlip = async (req, res) => {
     const { email, application_id } = req.body.params;
-    const directory = `./public/${email}/${application_id}`;
+    const directory = `./public/${email}/${application_id}/PaymentSlip`;
     console.log(directory);
     if (!fs.existsSync(directory)) {
         res.status(404).json({ message: "Payment Slip not found" });
@@ -77,7 +84,40 @@ const downloadPaymentSlip = async (req, res) => {
         }
     }
 };
+//Added get filepath route
+ const getFilePath = async (req, res) => {
+    const { email, application_id ,type} = req.body.params;
+    const directory = `./public/${email}/${application_id}/${type}`;
+    console.log(directory);
+    if (!fs.existsSync(directory)) {
+        res.status(404).json({ message: "File not found" });
+    } else {
+        try {
+            // Finding first file in `directory`
+            let filePath = "";
+            console.log("directory:", directory);
+            const files = await fsPromise.readdir(directory);
+            if (files.length > 0) {
+                const file = files[0];
+                filePath = path.join(directory, file);
+                console.log(filePath);
+            } else {
+                console.log("Directory is empty");
+            }
+            res.set("Content-Type", "application/json");
+            res.status(200).send({ filePath: filePath });
+        } catch (err) {
+            console.error(err);
+        }
+    }
+};
+ 
 
-exports.uploadPaymentSlip = uploadPaymentSlip;
+
+
+
+
+exports.uploadFiles = uploadFiles;
+exports.getFilePath=getFilePath
 exports.getPaymentSlipsUploadByEmail = getPaymentSlipsUploadByEmail;
 exports.downloadPaymentSlip = downloadPaymentSlip;
